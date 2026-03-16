@@ -1,32 +1,26 @@
-<?php 
-    session_start();
-    if (!isset($_SESSION['username'])) {
-        header("Location: login.php");
-    }
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
+require_once "../database/config.php";
+$sql = "SELECT * FROM bookingtable";
+$bookingsNo = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM bookingtable"));
+$messagesNo = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM feedbacktable"));
+$moviesNo = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM movietable"));
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Admin Dashboard</title>
     <link rel="icon" type="image/png" href="../img/logo.jpg">
     <link rel="stylesheet" href="../style/styles.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
 </head>
-
 <body>
-    <?php
-    $link = mysqli_connect("localhost", "root", "", "cinema_db");
-    $sql = "SELECT * FROM bookingTable";
-    $bookingsNo=mysqli_num_rows(mysqli_query($link, $sql));
-    $messagesNo=mysqli_num_rows(mysqli_query($link, "SELECT * FROM feedbackTable"));
-    $moviesNo=mysqli_num_rows(mysqli_query($link, "SELECT * FROM movieTable"));
-    ?>
     <div class="admin-section-header">
         <div class="admin-logo">
             LUX Cinema
@@ -35,128 +29,132 @@
             <i class="far fa-bell admin-notification-button"></i>
             <i class="far fa-comment-alt"></i>
             <a href="#">Welcome, Admin</a>
-            <img class="admin-user-avatar" src="../img/avatar.png" alt="">
+            <img class="admin-user-avatar" src="../img/avatar.png">
         </div>
     </div>
     <div class="admin-container">
-        <div class="admin-section admin-section1 ">
+        <div class="admin-section admin-section1">
             <ul>
-                <li><i class="fas fa-sliders-h"></i><a href="admin.php">Dashboard </a><i class="fas admin-dropdown fa-chevron-right"></i></li>
-                <li><i class="fas fa-ticket-alt"></i><a href="">Bookings</a> <i class="fas admin-dropdown fa-chevron-right"></i></li>
-                <li><i class="fas fa-film"></i>Movies <i class="fas admin-dropdown fa-chevron-right"></i></li>
-                <li><a href="logout.php"><i class="fas fa-user"></i>Logout <i class="fas admin-dropdown fa-chevron-right"></i></a></li>
+                <li>
+                    <i class="fas fa-sliders-h"></i>
+                    <a href="admin.php">Dashboard</a>
+                </li>
+                <li>
+                    <i class="fas fa-ticket-alt"></i>
+                    <a href="#">Bookings</a>
+                </li>
+                <li>
+                    <i class="fas fa-film"></i>
+                    Movies
+                </li>
+                <li>
+                    <a href="logout.php">
+                        <i class="fas fa-user"></i>Logout
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="admin-section admin-section2">
             <div class="admin-section-column">
                 <div class="admin-section-panel admin-section-stats">
                     <div class="admin-section-stats-panel">
-                        <i class="fas fa-ticket-alt" style="background-color: #cf4545"></i>
-                        <h2 style="color: #cf4545"><?php echo $bookingsNo ?></h2>
+                        <i class="fas fa-ticket-alt" style="background-color:#cf4545"></i>
+                        <h2 style="color:#cf4545"><?php echo $bookingsNo ?></h2>
                         <h3>Bookings</h3>
                     </div>
                     <div class="admin-section-stats-panel">
-                        <i class="fas fa-film" style="background-color: #4547cf"></i>
-                        <h2 style="color: #4547cf"><?php echo $moviesNo ?></h2>
+                        <i class="fas fa-film" style="background-color:#4547cf"></i>
+                        <h2 style="color:#4547cf"><?php echo $moviesNo ?></h2>
                         <h3>Movies</h3>
                     </div>
                     <div class="admin-section-stats-panel">
-                        <i class="fas fa-ticket-alt" style="background-color: #bb3c95"></i>
-                        <h2 style="color: #bb3c95">dummy</h2>
-                        <h3>Dummy</h3>
-                    </div>
-                    <div class="admin-section-stats-panel" style="border: none">
-                        <i class="fas fa-envelope" style="background-color: #3cbb6c"></i>
-                        <h2 style="color: #3cbb6c"><?php echo $messagesNo ?></h2>
+                        <i class="fas fa-envelope" style="background-color:#3cbb6c"></i>
+                        <h2 style="color:#3cbb6c"><?php echo $messagesNo ?></h2>
                         <h3>Messages</h3>
                     </div>
                 </div>
                 <div class="admin-section-panel admin-section-panel1">
                     <div class="admin-panel-section-header">
                         <h2>Bookings</h2>
-                        <i class="fas fa-ticket-alt" style="background-color: #cf4545"></i>
+                        <i class="fas fa-ticket-alt" style="background-color:#cf4545"></i>
                     </div>
                     <div class="admin-panel-section-content">
                         <?php
-                        if($result = mysqli_query($link, $sql)){
-                            if(mysqli_num_rows($result) > 0){
-                                while($row = mysqli_fetch_array($result)){
-                                    echo "<div class=\"admin-panel-section-booking-item\">\n";
-                                    echo "                            <div class=\"admin-panel-section-booking-response\">\n";
-                                    echo "                                <i class=\"fas fa-check accept-booking\" title=\"Verify booking\"></i>\n";
-                                    echo "                                <a href='deleteBooking.php?id=".$row['bookingID']."'><i class=\"fas fa-times decline-booking\" title=\"Reject booking\"></i></a>\n";
-                                    echo "                            </div>\n";
-                                    echo "                            <div class=\"admin-panel-section-booking-info\">\n";
-                                    echo "                                <div>\n";
-                                    echo "                                    <h3>". $row['movieName'] ."</h3>\n";
-                                    echo "                                    <i class=\"fas fa-circle \"></i>\n";
-                                    echo "                                    <h4>". $row['bookingTheatre'] ."</h4>\n";
-                                    echo "                                    <i class=\"fas fa-circle \"></i>\n";
-                                    echo "                                    <h4>". $row['bookingDate'] ."</h4>\n";
-                                    echo "                                    <i class=\"fas fa-circle \"></i>\n";
-                                    echo "                                    <h4>". $row['bookingTime'] ."</h4>\n";
-                                    echo "                                </div>\n";
-                                    echo "                                <div>\n";
-                                    echo "                                    <h4>". $row['bookingFName'] ." ". $row['bookingLName'] ."</h4>\n";
-                                    echo "                                    <i class=\"fas fa-circle\"></i>\n";
-                                    echo "                                    <h4>". $row['bookingPNumber'] ."</h4>\n";
-                                    echo "                                </div>\n";
-                                    echo "                            </div>\n";
-                                    echo "                        </div>";
-                                }
-                                mysqli_free_result($result);
-                            } else{
-                                echo '<h4 class="no-annot">No Bookings right now</h4>';
+                        $result = mysqli_query($conn, $sql);
+                        if ($result && mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "
+                                    <div class='admin-panel-section-booking-item'>
+                                    <div class='admin-panel-section-booking-response'>
+                                    <a href='deleteBooking.php?id=" . $row['bookingID'] . "'>
+                                    <i class='fas fa-times decline-booking'></i>
+                                    </a>
+                                    </div>
+                                    <div class='admin-panel-section-booking-info'>
+                                    <div>
+                                    <h3>" . $row['movieName'] . "</h3>
+                                    <i class='fas fa-circle'></i>
+                                    <h4>" . $row['bookingTheatre'] . "</h4>
+                                    <i class='fas fa-circle'></i>
+                                    <h4>" . $row['bookingDate'] . "</h4>
+                                    <i class='fas fa-circle'></i>
+                                    <h4>" . $row['bookingTime'] . "</h4>
+                                    </div>
+                                    <div>
+                                    <h4>" . $row['bookingFName'] . " " . $row['bookingLName'] . "</h4>
+                                    <i class='fas fa-circle'></i>
+                                    <h4>" . $row['bookingPNumber'] . "</h4>
+                                    </div>
+                                    </div>
+                                    </div>
+                                ";
                             }
-                        } else{
-                            echo "ERROR: Could not able to execute $sql. " . mysqli_error($link);
+                        } else {
+                            echo "<h4>No bookings right now</h4>";
                         }
                         ?>
                     </div>
                 </div>
                 <div class="admin-section-panel admin-section-panel2">
                     <div class="admin-panel-section-header">
-                        <h2>Movies</h2>
-                        <i class="fas fa-film" style="background-color: #4547cf"></i>
+                        <h2>Add Movie</h2>
+                        <i class="fas fa-film" style="background-color:#4547cf"></i>
                     </div>
-                    <form action="" method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <input placeholder="Title" type="text" name="movieTitle" required>
                         <input placeholder="Genre" type="text" name="movieGenre" required>
                         <input placeholder="Duration" type="number" name="movieDuration" required>
                         <input placeholder="Release Date" type="date" name="movieRelDate" required>
                         <input placeholder="Director" type="text" name="movieDirector" required>
                         <input placeholder="Actors" type="text" name="movieActors" required>
-                        <input type="file" name="movieImg" accept="image/*">
-                        <button type="submit" value="submit" name="submit" class="form-btn">Add Movie</button>
+                        <input type="file" name="movieImg" accept="image/*" required>
+                        <button type="submit" name="submit" class="form-btn">Add Movie</button>
                         <?php
-                        if(isset($_POST['submit'])){
-                            $insert_query = "INSERT INTO 
-                            movieTable (  movieImg,
-                                            movieTitle,
-                                            movieGenre,
-                                            movieDuration,
-                                            movieRelDate,
-                                            movieDirector,
-                                            movieActors)
-                            VALUES (        'img/".$_POST['movieImg']."',
-                                            '".$_POST["movieTitle"]."',
-                                            '".$_POST["movieGenre"]."',
-                                            '".$_POST["movieDuration"]."',
-                                            '".$_POST["movieRelDate"]."',
-                                            '".$_POST["movieDirector"]."',
-                                            '".$_POST["movieActors"]."')";
-                            mysqli_query($link,$insert_query);}
+                        if (isset($_POST['submit'])) {
+                            $title = mysqli_real_escape_string($conn, $_POST['movieTitle']);
+                            $genre = mysqli_real_escape_string($conn, $_POST['movieGenre']);
+                            $duration = $_POST['movieDuration'];
+                            $date = $_POST['movieRelDate'];
+                            $director = mysqli_real_escape_string($conn, $_POST['movieDirector']);
+                            $actors = mysqli_real_escape_string($conn, $_POST['movieActors']);
+                            $imageName = $_FILES['movieImg']['name'];
+                            $tmpName = $_FILES['movieImg']['tmp_name'];
+                            $path = "../img/" . $imageName;
+                            move_uploaded_file($tmpName, $path);
+                            $query = "INSERT INTO movietable
+                            (movieImg,movieTitle,movieGenre,movieDuration,movieRelDate,movieDirector,movieActors)
+                            VALUES
+                            ('img/$imageName','$title','$genre','$duration','$date','$director','$actors')";
+                            mysqli_query($conn, $query);
+                            echo "<script>alert('Movie Added Successfully');</script>";
+                        }
                         ?>
                     </form>
                 </div>
             </div>
-            
         </div>
     </div>
-
-    <script src="../scripts/jquery-3.3.1.min.js "></script>
-    <script src="../scripts/owl.carousel.min.js "></script>
-    <script src="../scripts/script.js "></script>
+    <script src="../scripts/jquery-3.3.1.min.js"></script>
+    <script src="../scripts/script.js"></script>
 </body>
-
 </html>
